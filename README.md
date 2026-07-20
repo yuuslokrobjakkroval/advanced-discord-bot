@@ -1,4 +1,4 @@
-# Advanced Multi-Purpose Discord Bot V2
+# Advanced Multi-Purpose Discord Bot
 
 A modular Discord bot foundation built with Bun, TypeScript, MongoDB, slash commands,
 and Discord Components v2.
@@ -80,4 +80,3 @@ bun start
 Never commit `.env`. Restrict the bot to only the Discord and MongoDB permissions it
 needs. Commands live in `src/commands`, events in `src/events`, and recurring workers
 in `src/services`.
-# advanced-discord-bot
