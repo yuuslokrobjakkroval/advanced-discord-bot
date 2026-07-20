@@ -1,0 +1,28 @@
+{
+  "name": "advanced-discord-bot-v2",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "An advanced multi-purpose Discord bot built with Bun, TypeScript, MongoDB and Discord Components v2.",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "bun src/index.ts",
+    "deploy": "bun src/deploy-commands.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "dependencies": {
+    "discord.js": "^14.19.3",
+    "dotenv": "^16.5.0",
+    "mongodb": "^6.17.0",
+    "zod": "^3.25.28"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "typescript": "^5.8.3"
+  }
+}
