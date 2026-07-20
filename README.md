@@ -1,4 +1,4 @@
-# Advanced Multi-Purpose Discord Bot V2
+# Advanced Multi-Purpose Discord Bot
 
 A modular Discord bot foundation built with Bun, TypeScript, MongoDB, slash commands,
 and Discord Components v2.
