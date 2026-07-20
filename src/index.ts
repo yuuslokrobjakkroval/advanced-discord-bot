@@ -13,6 +13,7 @@ import { onInteraction } from "./events/interactions.js";
 import { onMessageCreate } from "./events/message-create.js";
 import { onMessageDelete, onMessageUpdate } from "./events/message-logs.js";
 import { startReminderWorker } from "./services/reminders.js";
+import { startGiveawayWorker } from "./services/giveaways.js";
 
 const client = new Client({
   intents: [
@@ -35,6 +36,7 @@ client.once(Events.ClientReady, (ready) => {
   console.log(`Ready as ${ready.user.tag} in ${ready.guilds.cache.size} guild(s).`);
   ready.user.setActivity("/help · Advanced Bot V2");
   startReminderWorker(client, db);
+  startGiveawayWorker(client, db);
 });
 client.on(Events.InteractionCreate, (interaction) => onInteraction(interaction, commandMap, db, client));
 client.on(Events.MessageCreate, (message) => onMessageCreate(message, db).catch(console.error));

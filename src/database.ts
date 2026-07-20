@@ -28,6 +28,18 @@ export interface Ticket extends Document { channelId: string; guildId: string; o
 export interface Reminder extends Document { userId: string; channelId: string; text: string; dueAt: Date; delivered: boolean }
 export interface Review extends Document { guildId: string; userId: string; rating: number; text: string; createdAt: Date }
 export interface AutoReaction extends Document { guildId: string; channelId: string; emojis: string[] }
+export interface Giveaway extends Document {
+  guildId: string;
+  channelId: string;
+  messageId: string;
+  hostId: string;
+  prize: string;
+  winnerCount: number;
+  participants: string[];
+  endsAt: Date;
+  ended: boolean;
+  winnerIds?: string[];
+}
 
 const guildDefaults: Omit<GuildConfig, "guildId"> = {
   welcomeMessage: "Welcome {user} to **{server}**!",
@@ -52,6 +64,7 @@ export class Database {
   reminders!: Collection<Reminder>;
   reviews!: Collection<Review>;
   autoReactions!: Collection<AutoReaction>;
+  giveaways!: Collection<Giveaway>;
 
   async connect(): Promise<void> {
     await this.client.connect();
@@ -65,6 +78,7 @@ export class Database {
     this.reminders = db.collection("reminders");
     this.reviews = db.collection("reviews");
     this.autoReactions = db.collection("auto_reactions");
+    this.giveaways = db.collection("giveaways");
     await Promise.all([
       this.guilds.createIndex({ guildId: 1 }, { unique: true }),
       this.warnings.createIndex({ guildId: 1, userId: 1, createdAt: -1 }),
@@ -76,6 +90,8 @@ export class Database {
       this.reminders.createIndex({ delivered: 1, dueAt: 1 }),
       this.reviews.createIndex({ guildId: 1, userId: 1 }, { unique: true }),
       this.autoReactions.createIndex({ guildId: 1, channelId: 1 }, { unique: true }),
+      this.giveaways.createIndex({ messageId: 1 }, { unique: true }),
+      this.giveaways.createIndex({ ended: 1, endsAt: 1 }),
     ]);
   }
 

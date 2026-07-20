@@ -11,6 +11,7 @@ import {
 import type { Database } from "../database.js";
 import type { Command } from "../types.js";
 import { colors, embed } from "../utils.js";
+import { giveawayComponents } from "../services/giveaways.js";
 
 export async function onInteraction(
   interaction: Interaction,
@@ -25,6 +26,21 @@ export async function onInteraction(
       return;
     }
     if (!interaction.isButton() || !interaction.guild) return;
+    if (interaction.customId === "giveaway:join") {
+      const giveaway = await db.giveaways.findOne({ messageId: interaction.message.id, ended: false });
+      if (!giveaway) {
+        await interaction.reply({ content: "This giveaway is no longer active.", ephemeral: true });
+        return;
+      }
+      const joined = giveaway.participants.includes(interaction.user.id);
+      const participants = joined
+        ? giveaway.participants.filter((id) => id !== interaction.user.id)
+        : [...giveaway.participants, interaction.user.id];
+      await db.giveaways.updateOne({ _id: giveaway._id }, { $set: { participants } });
+      await interaction.update({ components: giveawayComponents({ ...giveaway, participants }) });
+      await interaction.followUp({ content: joined ? "You left the giveaway." : "You entered the giveaway! 🎉", ephemeral: true });
+      return;
+    }
     if (interaction.customId === "ticket:create") {
       const cfg = await db.ensureGuild(interaction.guild.id);
       const existing = await db.tickets.findOne({ guildId: interaction.guild.id, ownerId: interaction.user.id, status: "open" });

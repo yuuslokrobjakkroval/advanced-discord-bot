@@ -4,6 +4,7 @@ import { configurationCommands } from "./configuration.js";
 import { generalCommands } from "./general.js";
 import { extraCommands } from "./extras.js";
 import { gameCommands } from "./games.js";
+import { giveawayCommands } from "./giveaway.js";
 import { moderationCommands } from "./moderation.js";
 
 export const commands: Command[] = [
@@ -13,4 +14,5 @@ export const commands: Command[] = [
   ...configurationCommands,
   ...extraCommands,
   ...gameCommands,
+  ...giveawayCommands,
 ];
