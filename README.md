@@ -77,4 +77,3 @@ bun start
 Never commit `.env`. Restrict the bot to only the Discord and MongoDB permissions it
 needs. Commands live in `src/commands`, events in `src/events`, and recurring workers
 in `src/services`.
-# advanced-discord-bot
