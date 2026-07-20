@@ -10,31 +10,23 @@ import {
 } from "discord.js";
 import type { Command } from "../types.js";
 import { colors, embed } from "../utils.js";
+import { helpComponents } from "../services/help-ui.js";
 
 export const helpCommand: Command = {
   data: new SlashCommandBuilder().setName("help").setDescription("View the bot command center"),
   async execute(interaction) {
-    const panel = new ContainerBuilder().setAccentColor(colors.primary).addTextDisplayComponents(
-      new TextDisplayBuilder().setContent([
-        "# Advanced Bot V2",
-        "**Community** — `/afk`, `/poll`, `/remind`, `/rank`, `/leaderboard`",
-        "**Moderation** — `/moderation`, `/purge`, `/slowmode`, `/warnings`",
-        "**Configuration** — `/automod`, `/autoresponder`, `/setup`",
-        "**Support** — `/ticket panel`",
-        "**Utilities** — `/user-info`, `/server-info`, `/invites`, `/review`",
-        "**Games** — `/games rps|slots|coinflip|dice`",
-        "",
-        "Use Discord's command picker to explore every option.",
-      ].join("\n")),
-    );
-    await interaction.reply({ components: [panel], flags: [MessageFlags.Ephemeral, MessageFlags.IsComponentsV2] });
+    await interaction.reply({
+      components: helpComponents("home", interaction.client.user.displayName, interaction.guild?.name),
+      flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
+    });
   },
 };
 
 export const pingCommand: Command = {
   data: new SlashCommandBuilder().setName("ping").setDescription("Check bot latency"),
   async execute(interaction) {
-    const sent = await interaction.reply({ content: "Measuring…", fetchReply: true });
+    const response = await interaction.reply({ content: "Measuring…", withResponse: true });
+    const sent = response.resource?.message ?? await interaction.fetchReply();
     await interaction.editReply(`Pong! API: **${interaction.client.ws.ping}ms** · Round trip: **${sent.createdTimestamp - interaction.createdTimestamp}ms**`);
   },
 };
@@ -46,10 +38,11 @@ export const pollCommand: Command = {
     .addStringOption((o) => o.setName("question").setDescription("Question to ask").setRequired(true).setMaxLength(200)),
   async execute(interaction) {
     const question = interaction.options.getString("question", true);
-    const message = await interaction.reply({
+    const response = await interaction.reply({
       embeds: [embed("📊 Community Poll", question).setFooter({ text: `Started by ${interaction.user.username}` })],
-      fetchReply: true,
+      withResponse: true,
     });
+    const message = response.resource?.message ?? await interaction.fetchReply();
     await message.react("👍");
     await message.react("👎");
   },

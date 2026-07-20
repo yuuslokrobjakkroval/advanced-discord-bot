@@ -21,6 +21,11 @@ and Discord Components v2.
 - Role hierarchy, managed-role, duplicate, and option-limit validation
 - Persistent invite snapshots and join-to-inviter attribution
 - Invite leaderboards, leave/fake tracking, bonuses, resets, and attribution logs
+- Persistent button-controlled Tic-Tac-Toe and Connect 4 multiplayer
+- Per-command cooldowns, component burst limits, and escalating anti-abuse penalties
+- Native Components v2 onboarding, invite, automod, level, and message logs
+- Automated game-logic and rate-limit tests
+- Multi-stage Bun Docker image, MongoDB Compose stack, and health endpoint
 - Reviews, invite statistics, and configurable auto reactions
 - Ticket add/remove-user controls
 - `/user-info`, `/server-info`, and an expanded stateful arcade
@@ -59,6 +64,27 @@ bun run typecheck
 bun start
 ```
 
+Validation:
+
+```powershell
+bun run typecheck
+bun run test
+bun run validate:live
+```
+
+`validate:live` performs a MongoDB ping and a read-only Discord REST identity check.
+
+## Docker
+
+```powershell
+docker compose up -d --build
+docker compose ps
+```
+
+Compose starts the bot and MongoDB 7 with persistent database storage. The bot exposes
+`GET /health` on `127.0.0.1:3000` and the container health check waits for Discord
+gateway readiness.
+
 ## Initial server setup
 
 1. Invite the bot with the `bot` and `applications.commands` scopes.
@@ -87,6 +113,7 @@ bun start
 - `/voice setup|rename|limit|lock|unlock|permit|reject|transfer`
 - `/reaction-role create|add|remove|refresh|delete|list`
 - `/invites user|leaderboard|add|remove|reset|config`
+- `/multiplayer challenge|resign`
 
 Never commit `.env`. Restrict the bot to only the Discord and MongoDB permissions it
 needs. Commands live in `src/commands`, events in `src/events`, and recurring workers

@@ -87,6 +87,20 @@ export interface InviteBonus extends Document {
   userId: string;
   bonus: number;
 }
+export interface GameSession extends Document {
+  guildId: string;
+  channelId: string;
+  messageId?: string;
+  game: "tic-tac-toe" | "connect-4";
+  playerOneId: string;
+  playerTwoId: string;
+  turnId: string;
+  status: "pending" | "active" | "finished";
+  board: number[];
+  winnerId?: string;
+  createdAt: Date;
+  expiresAt: Date;
+}
 
 const guildDefaults: Omit<GuildConfig, "guildId"> = {
   welcomeMessage: "Welcome {user} to **{server}**!",
@@ -117,6 +131,7 @@ export class Database {
   inviteSnapshots!: Collection<InviteSnapshot>;
   inviteAttributions!: Collection<InviteAttribution>;
   inviteBonuses!: Collection<InviteBonus>;
+  gameSessions!: Collection<GameSession>;
 
   async connect(): Promise<void> {
     await this.client.connect();
@@ -136,6 +151,7 @@ export class Database {
     this.inviteSnapshots = db.collection("invite_snapshots");
     this.inviteAttributions = db.collection("invite_attributions");
     this.inviteBonuses = db.collection("invite_bonuses");
+    this.gameSessions = db.collection("game_sessions");
     await Promise.all([
       this.guilds.createIndex({ guildId: 1 }, { unique: true }),
       this.warnings.createIndex({ guildId: 1, userId: 1, createdAt: -1 }),
@@ -156,6 +172,9 @@ export class Database {
       this.inviteAttributions.createIndex({ guildId: 1, memberId: 1 }, { unique: true }),
       this.inviteAttributions.createIndex({ guildId: 1, inviterId: 1, leftAt: 1, fake: 1 }),
       this.inviteBonuses.createIndex({ guildId: 1, userId: 1 }, { unique: true }),
+      this.gameSessions.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
+      this.gameSessions.createIndex({ guildId: 1, playerOneId: 1, status: 1 }),
+      this.gameSessions.createIndex({ guildId: 1, playerTwoId: 1, status: 1 }),
     ]);
   }
 

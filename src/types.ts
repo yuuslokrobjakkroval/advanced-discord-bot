@@ -19,6 +19,7 @@ export interface Command {
     readonly name: string;
     toJSON(): RESTPostAPIChatInputApplicationCommandsJSONBody;
   };
+  cooldown?: number;
   execute(interaction: ChatInputCommandInteraction, context: BotContext): Promise<void>;
   autocomplete?(interaction: AutocompleteInteraction, context: BotContext): Promise<void>;
 }

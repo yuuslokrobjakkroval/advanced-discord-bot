@@ -12,6 +12,7 @@ const schema = z.object({
   MONGODB_URI: z.string().min(1).default("mongodb://127.0.0.1:27017"),
   MONGODB_DATABASE: z.string().min(1).default("advanced_discord_bot"),
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
+  HEALTH_PORT: z.coerce.number().int().min(1).max(65535).default(3000),
 });
 
 export const config = schema.parse(process.env);

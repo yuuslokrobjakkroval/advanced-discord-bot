@@ -1,6 +1,6 @@
 import { PermissionFlagsBits, type Message, type TextChannel } from "discord.js";
 import type { Database } from "../database.js";
-import { colors, embed, xpForLevel } from "../utils.js";
+import { colors, messageComponentsV2, xpForLevel } from "../utils.js";
 
 const spam = new Map<string, number[]>();
 
@@ -32,7 +32,7 @@ export async function onMessageCreate(message: Message, db: Database): Promise<v
       if (warning) setTimeout(() => warning.delete().catch(() => undefined), 5_000);
       if (cfg.logChannelId) {
         const log = message.guild.channels.cache.get(cfg.logChannelId);
-        if (log?.isTextBased()) await (log as TextChannel).send({ embeds: [embed("Automod action", `${message.author} in ${message.channel}\n**Reason:** ${reason}`, colors.warning)] }).catch(() => undefined);
+        if (log?.isTextBased()) await (log as TextChannel).send(messageComponentsV2("Automod action", `${message.author} in ${message.channel}\n**Reason:** ${reason}`, colors.warning)).catch(() => undefined);
       }
       return;
     }
@@ -70,6 +70,6 @@ export async function onMessageCreate(message: Message, db: Database): Promise<v
   );
   if (leveled) {
     const channel = cfg.levelChannelId ? message.guild.channels.cache.get(cfg.levelChannelId) : message.channel;
-    if (channel?.isTextBased()) await (channel as TextChannel).send({ embeds: [embed("Level up! 🎉", `${message.author} reached **level ${level}**!`, colors.success)] }).catch(() => undefined);
+    if (channel?.isTextBased()) await (channel as TextChannel).send(messageComponentsV2("Level up! 🎉", `${message.author} reached **level ${level}**!`, colors.success)).catch(() => undefined);
   }
 }

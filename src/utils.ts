@@ -7,6 +7,7 @@ import {
   type ChatInputCommandInteraction,
   type GuildMember,
   type InteractionReplyOptions,
+  type MessageCreateOptions,
 } from "discord.js";
 
 export const colors = {
@@ -28,6 +29,15 @@ export function componentsV2(title: string, description: string, color: number =
     flags: ephemeral
       ? MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral
       : MessageFlags.IsComponentsV2,
+  };
+}
+
+export function messageComponentsV2(title: string, description: string, color: number = colors.primary): MessageCreateOptions {
+  return {
+    components: [new ContainerBuilder().setAccentColor(color).addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(`# ${title}\n${description}`),
+    )],
+    flags: MessageFlags.IsComponentsV2,
   };
 }
 

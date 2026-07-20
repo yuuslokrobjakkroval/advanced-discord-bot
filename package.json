@@ -10,7 +10,9 @@
     "build": "tsc -p tsconfig.json",
     "start": "bun src/index.ts",
     "deploy": "bun src/deploy-commands.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --experimental-test-isolation=none --test \"tests/*.test.mjs\"",
+    "validate:live": "bun src/validate-live.ts"
   },
   "engines": {
     "bun": ">=1.1.0"

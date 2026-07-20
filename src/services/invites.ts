@@ -1,6 +1,6 @@
 import type { Client, Guild, GuildMember, Invite, PartialGuildMember, TextChannel } from "discord.js";
 import type { Database } from "../database.js";
-import { colors, embed } from "../utils.js";
+import { colors, messageComponentsV2 } from "../utils.js";
 
 export async function syncGuildInvites(guild: Guild, db: Database): Promise<void> {
   const invites = await guild.invites.fetch().catch(() => null);
@@ -67,11 +67,11 @@ async function sendInviteLog(member: GuildMember, db: Database, invite: Invite |
   const channel = channelId ? member.guild.channels.cache.get(channelId) : null;
   if (!channel?.isTextBased()) return;
   const inviter = invite?.inviterId ? `<@${invite.inviterId}>` : "**Unknown** (vanity URL, missing permission, or concurrent join)";
-  await (channel as TextChannel).send({ embeds: [embed(
+  await (channel as TextChannel).send(messageComponentsV2(
     "Invite attribution",
     `${member} joined using ${invite ? `\`${invite.code}\`` : "an unknown invite"}.\n**Inviter:** ${inviter}\n**Account classification:** ${fake ? "⚠️ Fake/suspicious" : "✅ Valid"}`,
     fake ? colors.warning : colors.success,
-  )] }).catch(() => undefined);
+  )).catch(() => undefined);
 }
 
 export async function inviteStats(db: Database, guildId: string, userId: string) {

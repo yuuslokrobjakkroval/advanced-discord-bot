@@ -24,7 +24,8 @@ export const giveawayCommand: Command = {
         winnerCount: interaction.options.getInteger("winners") ?? 1,
         participants: [], endsAt, ended: false,
       };
-      const message = await interaction.reply({ components: giveawayComponents(giveaway), flags: 32768, fetchReply: true });
+      const response = await interaction.reply({ components: giveawayComponents(giveaway), flags: 32768, withResponse: true });
+      const message = response.resource?.message ?? await interaction.fetchReply();
       await db.giveaways.insertOne({ ...giveaway, messageId: message.id });
       return;
     }

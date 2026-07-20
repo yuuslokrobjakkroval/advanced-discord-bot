@@ -16,6 +16,9 @@ import type { Command } from "../types.js";
 import { colors, embed } from "../utils.js";
 import { giveawayComponents } from "../services/giveaways.js";
 import { ObjectId } from "mongodb";
+import { helpComponents, isHelpCategory } from "../services/help-ui.js";
+import { interactionLimiter } from "../services/rate-limit.js";
+import { handleMultiplayerButton } from "../services/multiplayer.js";
 
 export async function onInteraction(
   interaction: Interaction,
@@ -26,7 +29,36 @@ export async function onInteraction(
   try {
     if (interaction.isChatInputCommand()) {
       const command = commands.get(interaction.commandName);
-      if (command) await command.execute(interaction, { client, db });
+      if (command) {
+        const cooldown = command.cooldown ?? 3_000;
+        const result = interactionLimiter.check(`command:${interaction.guildId ?? "dm"}:${interaction.user.id}:${interaction.commandName}`, 1, cooldown);
+        if (!result.allowed) {
+          await interaction.reply({
+            content: `Slow down — try this command again in **${Math.ceil(result.retryAfterMs / 1000)}s**.`,
+            ephemeral: true,
+          });
+          return;
+        }
+        await command.execute(interaction, { client, db });
+      }
+      return;
+    }
+    if (interaction.isMessageComponent()) {
+      const result = interactionLimiter.check(`component:${interaction.user.id}:${interaction.customId}`, 3, 2_000);
+      if (!result.allowed) {
+        if (interaction.isRepliable()) await interaction.reply({
+          content: `You're using controls too quickly. Try again in **${Math.ceil(result.retryAfterMs / 1000)}s**.`,
+          ephemeral: true,
+        }).catch(() => undefined);
+        return;
+      }
+    }
+    if (interaction.isStringSelectMenu() && interaction.customId === "help:category") {
+      const category = interaction.values[0];
+      if (!category || !isHelpCategory(category)) return;
+      await interaction.update({
+        components: helpComponents(category, interaction.client.user.displayName, interaction.guild?.name),
+      });
       return;
     }
     if (interaction.isStringSelectMenu() && interaction.customId.startsWith("reaction-role:") && interaction.guild) {
@@ -89,6 +121,7 @@ export async function onInteraction(
       return;
     }
     if (!interaction.isButton() || !interaction.guild) return;
+    if (await handleMultiplayerButton(interaction, db)) return;
     if (interaction.customId.startsWith("voice:")) {
       const voice = await db.tempVoices.findOne({ channelId: interaction.channelId });
       if (!voice) {
