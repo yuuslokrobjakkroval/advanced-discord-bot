@@ -1,13 +1,12 @@
 import {
   ChannelType,
-  EmbedBuilder,
   PermissionFlagsBits,
   SlashCommandBuilder,
   type GuildMember,
   type TextChannel,
 } from "discord.js";
 import type { Command } from "../types.js";
-import { colors, embed, requirePermission } from "../utils.js";
+import { colors, componentsV2, requirePermission } from "../utils.js";
 
 const userInfo: Command = {
   data: new SlashCommandBuilder().setName("user-info").setDescription("Display information about a server member")
@@ -16,15 +15,12 @@ const userInfo: Command = {
     const user = interaction.options.getUser("user") ?? interaction.user;
     const member = await interaction.guild!.members.fetch(user.id).catch(() => null);
     const roles = member?.roles.cache.filter((role) => role.id !== interaction.guildId).map(String).slice(0, 15).join(" ") || "None";
-    await interaction.reply({ embeds: [new EmbedBuilder()
-      .setColor(colors.primary).setAuthor({ name: user.tag, iconURL: user.displayAvatarURL() })
-      .setThumbnail(user.displayAvatarURL({ size: 256 }))
-      .addFields(
-        { name: "User ID", value: `\`${user.id}\``, inline: true },
-        { name: "Account created", value: `<t:${Math.floor(user.createdTimestamp / 1000)}:R>`, inline: true },
-        { name: "Joined server", value: member?.joinedTimestamp ? `<t:${Math.floor(member.joinedTimestamp / 1000)}:R>` : "Unknown", inline: true },
-        { name: "Roles", value: roles },
-      ).setTimestamp()] });
+    await interaction.reply(componentsV2(`User Info · ${user.tag}`, [
+      `**User ID:** \`${user.id}\``,
+      `**Account created:** <t:${Math.floor(user.createdTimestamp / 1000)}:R>`,
+      `**Joined server:** ${member?.joinedTimestamp ? `<t:${Math.floor(member.joinedTimestamp / 1000)}:R>` : "Unknown"}`,
+      `**Roles:** ${roles}`,
+    ].join("\n")));
   },
 };
 
@@ -34,16 +30,14 @@ const serverInfo: Command = {
     const guild = interaction.guild!;
     await guild.members.fetch().catch(() => undefined);
     const bots = guild.members.cache.filter((member) => member.user.bot).size;
-    await interaction.reply({ embeds: [new EmbedBuilder().setColor(colors.primary)
-      .setTitle(guild.name).setThumbnail(guild.iconURL({ size: 256 }))
-      .addFields(
-        { name: "Owner", value: `<@${guild.ownerId}>`, inline: true },
-        { name: "Members", value: `${guild.memberCount - bots} humans · ${bots} bots`, inline: true },
-        { name: "Channels", value: String(guild.channels.cache.size), inline: true },
-        { name: "Roles", value: String(guild.roles.cache.size - 1), inline: true },
-        { name: "Created", value: `<t:${Math.floor(guild.createdTimestamp / 1000)}:R>`, inline: true },
-        { name: "Server ID", value: `\`${guild.id}\``, inline: true },
-      ).setTimestamp()] });
+    await interaction.reply(componentsV2(guild.name, [
+      `**Owner:** <@${guild.ownerId}>`,
+      `**Members:** ${guild.memberCount - bots} humans · ${bots} bots`,
+      `**Channels:** ${guild.channels.cache.size}`,
+      `**Roles:** ${guild.roles.cache.size - 1}`,
+      `**Created:** <t:${Math.floor(guild.createdTimestamp / 1000)}:R>`,
+      `**Server ID:** \`${guild.id}\``,
+    ].join("\n")));
   },
 };
 
@@ -59,7 +53,7 @@ const invites: Command = {
     const all = await interaction.guild!.invites.fetch();
     const owned = all.filter((invite) => invite.inviterId === user.id);
     const uses = owned.reduce((total, invite) => total + (invite.uses ?? 0), 0);
-    await interaction.reply({ embeds: [embed(`Invites · ${user.username}`, `Tracked uses: **${uses}**\nActive links: **${owned.size}**`)] });
+    await interaction.reply(componentsV2(`Invites · ${user.username}`, `Tracked uses: **${uses}**\nActive links: **${owned.size}**`));
   },
 };
 
@@ -78,12 +72,12 @@ const review: Command = {
         { $set: { rating, text, createdAt: new Date() } },
         { upsert: true },
       );
-      await interaction.reply({ embeds: [embed("Review saved", `${"⭐".repeat(rating)}\n${text}`, colors.success)] });
+      await interaction.reply(componentsV2("Review saved", `${"⭐".repeat(rating)}\n${text}`, colors.success));
       return;
     }
     const rows = await db.reviews.find({ guildId: interaction.guildId! }).sort({ createdAt: -1 }).limit(10).toArray();
     const body = rows.length ? rows.map((item) => `${"⭐".repeat(item.rating)} <@${item.userId}>\n${item.text}`).join("\n\n") : "No reviews yet.";
-    await interaction.reply({ embeds: [embed("Community reviews", body)] });
+    await interaction.reply(componentsV2("Community reviews", body));
   },
 };
 

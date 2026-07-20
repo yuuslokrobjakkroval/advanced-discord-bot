@@ -1,6 +1,6 @@
 import { PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import type { Command } from "../types.js";
-import { colors, embed, requirePermission } from "../utils.js";
+import { colors, componentsV2, requirePermission } from "../utils.js";
 
 export const automodCommand: Command = {
   data: new SlashCommandBuilder().setName("automod").setDescription("Configure automatic moderation")
@@ -21,13 +21,13 @@ export const automodCommand: Command = {
     const cfg = await db.ensureGuild(interaction.guildId!);
     const sub = interaction.options.getSubcommand();
     if (sub === "status") {
-      await interaction.reply({ embeds: [embed("Automod Status", `Enabled: **${cfg.automodEnabled}**\nAnti-spam: **${cfg.antiSpam}**\nAnti-ping: **${cfg.antiPing}**\nMax mentions: **${cfg.maxMentions}**\nBlocked words: **${cfg.badWords.length}**`)], ephemeral: true });
+      await interaction.reply(componentsV2("Automod Status", `Enabled: **${cfg.automodEnabled}**\nAnti-spam: **${cfg.antiSpam}**\nAnti-ping: **${cfg.antiPing}**\nMax mentions: **${cfg.maxMentions}**\nBlocked words: **${cfg.badWords.length}**`, colors.primary, true));
       return;
     }
     if (sub === "toggle") {
       const enabled = interaction.options.getBoolean("enabled", true);
       await db.guilds.updateOne({ guildId: interaction.guildId! }, { $set: { automodEnabled: enabled } });
-      await interaction.reply({ embeds: [embed("Automod updated", `Automod is now **${enabled ? "enabled" : "disabled"}**.`, colors.success)], ephemeral: true });
+      await interaction.reply(componentsV2("Automod updated", `Automod is now **${enabled ? "enabled" : "disabled"}**.`, colors.success, true));
       return;
     }
     if (sub === "protections") {
@@ -80,7 +80,7 @@ export const autoresponderCommand: Command = {
       await interaction.reply({ content: result.deletedCount ? "✅ Autoresponder removed." : "That trigger was not found.", ephemeral: true });
     } else {
       const rows = await db.autoresponders.find({ guildId }).sort({ trigger: 1 }).limit(50).toArray();
-      await interaction.reply({ embeds: [embed("Autoresponders", rows.length ? rows.map((r) => `• \`${r.trigger}\`${r.exact ? " (exact)" : ""}`).join("\n") : "None configured.")], ephemeral: true });
+      await interaction.reply(componentsV2("Autoresponders", rows.length ? rows.map((r) => `• \`${r.trigger}\`${r.exact ? " (exact)" : ""}`).join("\n") : "None configured.", colors.primary, true));
     }
   },
 };
@@ -108,7 +108,7 @@ export const setupCommand: Command = {
     };
     const updates = Object.fromEntries(Object.entries(values).filter(([, value]) => value !== undefined));
     await db.guilds.updateOne({ guildId: interaction.guildId! }, { $set: updates });
-    await interaction.reply({ embeds: [embed("Setup saved", "Your provided server settings have been updated.", colors.success)], ephemeral: true });
+    await interaction.reply(componentsV2("Setup saved", "Your provided server settings have been updated.", colors.success, true));
   },
 };
 

@@ -13,14 +13,15 @@ and Discord Components v2.
 - Automod, join/leave, and ticket transcript logging
 - Message edit and deletion logging
 - Components v2 help and ticket panels
+- Persistent Components v2 giveaways with entry buttons, automatic ending, manual ending, and rerolls
 - Reviews, invite statistics, and configurable auto reactions
 - Ticket add/remove-user controls
-- `/user-info`, `/server-info`, and `/games rps|slots|coinflip|dice`
+- `/user-info`, `/server-info`, and an expanded stateful arcade
 - MongoDB indexes, environment validation, and graceful shutdown
 
-The repository is an extensible, launch-ready core. Large optional modules such as the
-full game suite, giveaways, reaction roles, persistent invite attribution, and
-join-to-create voice controls are not represented as completed features.
+The repository is an extensible, launch-ready core. Reaction roles, persistent invite
+attribution, join-to-create voice controls, and production-grade multiplayer game
+matchmaking remain future modules.
 
 ## Requirements
 
@@ -73,6 +74,8 @@ bun start
 - `/review submit|list`, `/invites`, `/auto-react set|remove`
 - `/user-info`, `/server-info`
 - `/games rps|slots|coinflip|dice`
+- `/games 2048|connect-4|hangman|minesweeper|pokemon|snake|trivia|wordle|tic-tac-toe`
+- `/giveaway create|end|reroll`
 
 Never commit `.env`. Restrict the bot to only the Discord and MongoDB permissions it
 needs. Commands live in `src/commands`, events in `src/events`, and recurring workers

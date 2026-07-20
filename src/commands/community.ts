@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "discord.js";
 import type { Command } from "../types.js";
-import { colors, embed, xpForLevel } from "../utils.js";
+import { colors, componentsV2, xpForLevel } from "../utils.js";
 
 export const afkCommand: Command = {
   data: new SlashCommandBuilder().setName("afk").setDescription("Set your AFK status")
@@ -12,7 +12,7 @@ export const afkCommand: Command = {
       { $set: { reason, since: new Date() } },
       { upsert: true },
     );
-    await interaction.reply({ embeds: [embed("AFK enabled", `I'll let people know you're away: **${reason}**`, colors.success)], ephemeral: true });
+    await interaction.reply(componentsV2("AFK enabled", `I'll let people know you're away: **${reason}**`, colors.success, true));
   },
 };
 
@@ -22,7 +22,7 @@ export const rankCommand: Command = {
   async execute(interaction, { db }) {
     const user = interaction.options.getUser("user") ?? interaction.user;
     const row = await db.levels.findOne({ guildId: interaction.guildId!, userId: user.id });
-    await interaction.reply({ embeds: [embed(`${user.username}'s Rank`, `Level **${row?.level ?? 0}**\nXP **${row?.xp ?? 0} / ${xpForLevel(row?.level ?? 0)}**`)] });
+    await interaction.reply(componentsV2(`${user.username}'s Rank`, `Level **${row?.level ?? 0}**\nXP **${row?.xp ?? 0} / ${xpForLevel(row?.level ?? 0)}**`));
   },
 };
 
@@ -33,7 +33,7 @@ export const leaderboardCommand: Command = {
     const body = rows.length
       ? rows.map((r, i) => `**${i + 1}.** <@${r.userId}> — Level ${r.level} (${r.xp} XP)`).join("\n")
       : "No one has earned XP yet.";
-    await interaction.reply({ embeds: [embed("🏆 Leaderboard", body)] });
+    await interaction.reply(componentsV2("🏆 Leaderboard", body));
   },
 };
 
