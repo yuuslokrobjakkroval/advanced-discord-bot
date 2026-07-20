@@ -12,6 +12,8 @@ export interface GuildConfig extends Document {
   ticketSupportRoleId?: string;
   voiceLobbyId?: string;
   voiceCategoryId?: string;
+  inviteLogChannelId?: string;
+  inviteFakeAccountDays?: number;
   levelChannelId?: string;
   levelEnabled: boolean;
   automodEnabled: boolean;
@@ -64,6 +66,27 @@ export interface ReactionRolePanel extends Document {
   createdBy: string;
   createdAt: Date;
 }
+export interface InviteSnapshot extends Document {
+  guildId: string;
+  code: string;
+  uses: number;
+  inviterId?: string;
+  expiresAt?: Date;
+}
+export interface InviteAttribution extends Document {
+  guildId: string;
+  memberId: string;
+  inviterId?: string;
+  code?: string;
+  joinedAt: Date;
+  leftAt?: Date;
+  fake: boolean;
+}
+export interface InviteBonus extends Document {
+  guildId: string;
+  userId: string;
+  bonus: number;
+}
 
 const guildDefaults: Omit<GuildConfig, "guildId"> = {
   welcomeMessage: "Welcome {user} to **{server}**!",
@@ -91,6 +114,9 @@ export class Database {
   giveaways!: Collection<Giveaway>;
   tempVoices!: Collection<TempVoice>;
   reactionRoles!: Collection<ReactionRolePanel>;
+  inviteSnapshots!: Collection<InviteSnapshot>;
+  inviteAttributions!: Collection<InviteAttribution>;
+  inviteBonuses!: Collection<InviteBonus>;
 
   async connect(): Promise<void> {
     await this.client.connect();
@@ -107,6 +133,9 @@ export class Database {
     this.giveaways = db.collection("giveaways");
     this.tempVoices = db.collection("temp_voices");
     this.reactionRoles = db.collection("reaction_role_panels");
+    this.inviteSnapshots = db.collection("invite_snapshots");
+    this.inviteAttributions = db.collection("invite_attributions");
+    this.inviteBonuses = db.collection("invite_bonuses");
     await Promise.all([
       this.guilds.createIndex({ guildId: 1 }, { unique: true }),
       this.warnings.createIndex({ guildId: 1, userId: 1, createdAt: -1 }),
@@ -123,6 +152,10 @@ export class Database {
       this.tempVoices.createIndex({ channelId: 1 }, { unique: true }),
       this.tempVoices.createIndex({ guildId: 1, ownerId: 1 }),
       this.reactionRoles.createIndex({ guildId: 1, messageId: 1 }),
+      this.inviteSnapshots.createIndex({ guildId: 1, code: 1 }, { unique: true }),
+      this.inviteAttributions.createIndex({ guildId: 1, memberId: 1 }, { unique: true }),
+      this.inviteAttributions.createIndex({ guildId: 1, inviterId: 1, leftAt: 1, fake: 1 }),
+      this.inviteBonuses.createIndex({ guildId: 1, userId: 1 }, { unique: true }),
     ]);
   }
 

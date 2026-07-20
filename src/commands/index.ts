@@ -7,6 +7,7 @@ import { gameCommands } from "./games.js";
 import { giveawayCommands } from "./giveaway.js";
 import { voiceCommands } from "./voice.js";
 import { reactionRoleCommands } from "./reaction-role.js";
+import { inviteCommands } from "./invites.js";
 import { moderationCommands } from "./moderation.js";
 
 export const commands: Command[] = [
@@ -19,4 +20,5 @@ export const commands: Command[] = [
   ...giveawayCommands,
   ...voiceCommands,
   ...reactionRoleCommands,
+  ...inviteCommands,
 ];

@@ -105,4 +105,4 @@ const autoReact: Command = {
   },
 };
 
-export const extraCommands = [userInfo, serverInfo, invites, review, autoReact];
+export const extraCommands = [userInfo, serverInfo, review, autoReact];

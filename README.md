@@ -19,13 +19,16 @@ and Discord Components v2.
 - Voice limits, permit/reject, disconnect, and ownership transfer controls
 - Persistent Components v2 reaction-role panels with select menus
 - Role hierarchy, managed-role, duplicate, and option-limit validation
+- Persistent invite snapshots and join-to-inviter attribution
+- Invite leaderboards, leave/fake tracking, bonuses, resets, and attribution logs
 - Reviews, invite statistics, and configurable auto reactions
 - Ticket add/remove-user controls
 - `/user-info`, `/server-info`, and an expanded stateful arcade
 - MongoDB indexes, environment validation, and graceful shutdown
 
-The repository is an extensible, launch-ready core. Persistent invite attribution and
-production-grade multiplayer game matchmaking remain future modules.
+The repository is an extensible, launch-ready core. Production-grade multiplayer game
+matchmaking and some Discord edge cases such as exact vanity-URL attribution remain
+future modules.
 
 ## Requirements
 
@@ -76,13 +79,14 @@ bun start
 - `/setup`
 - `/ticket panel`
 - `/ticket add-user|remove-user`
-- `/review submit|list`, `/invites`, `/auto-react set|remove`
+- `/review submit|list`, `/auto-react set|remove`
 - `/user-info`, `/server-info`
 - `/games rps|slots|coinflip|dice`
 - `/games 2048|connect-4|hangman|minesweeper|pokemon|snake|trivia|wordle|tic-tac-toe`
 - `/giveaway create|end|reroll`
 - `/voice setup|rename|limit|lock|unlock|permit|reject|transfer`
 - `/reaction-role create|add|remove|refresh|delete|list`
+- `/invites user|leaderboard|add|remove|reset|config`
 
 Never commit `.env`. Restrict the bot to only the Discord and MongoDB permissions it
 needs. Commands live in `src/commands`, events in `src/events`, and recurring workers
