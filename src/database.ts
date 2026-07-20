@@ -10,6 +10,8 @@ export interface GuildConfig extends Document {
   leaveMessage: string;
   ticketCategoryId?: string;
   ticketSupportRoleId?: string;
+  voiceLobbyId?: string;
+  voiceCategoryId?: string;
   levelChannelId?: string;
   levelEnabled: boolean;
   automodEnabled: boolean;
@@ -40,6 +42,28 @@ export interface Giveaway extends Document {
   ended: boolean;
   winnerIds?: string[];
 }
+export interface TempVoice extends Document {
+  guildId: string;
+  channelId: string;
+  ownerId: string;
+  createdAt: Date;
+}
+export interface ReactionRoleOption {
+  roleId: string;
+  label: string;
+  description?: string;
+  emoji?: string;
+}
+export interface ReactionRolePanel extends Document {
+  guildId: string;
+  channelId: string;
+  messageId?: string;
+  title: string;
+  description: string;
+  options: ReactionRoleOption[];
+  createdBy: string;
+  createdAt: Date;
+}
 
 const guildDefaults: Omit<GuildConfig, "guildId"> = {
   welcomeMessage: "Welcome {user} to **{server}**!",
@@ -65,6 +89,8 @@ export class Database {
   reviews!: Collection<Review>;
   autoReactions!: Collection<AutoReaction>;
   giveaways!: Collection<Giveaway>;
+  tempVoices!: Collection<TempVoice>;
+  reactionRoles!: Collection<ReactionRolePanel>;
 
   async connect(): Promise<void> {
     await this.client.connect();
@@ -79,6 +105,8 @@ export class Database {
     this.reviews = db.collection("reviews");
     this.autoReactions = db.collection("auto_reactions");
     this.giveaways = db.collection("giveaways");
+    this.tempVoices = db.collection("temp_voices");
+    this.reactionRoles = db.collection("reaction_role_panels");
     await Promise.all([
       this.guilds.createIndex({ guildId: 1 }, { unique: true }),
       this.warnings.createIndex({ guildId: 1, userId: 1, createdAt: -1 }),
@@ -92,6 +120,9 @@ export class Database {
       this.autoReactions.createIndex({ guildId: 1, channelId: 1 }, { unique: true }),
       this.giveaways.createIndex({ messageId: 1 }, { unique: true }),
       this.giveaways.createIndex({ ended: 1, endsAt: 1 }),
+      this.tempVoices.createIndex({ channelId: 1 }, { unique: true }),
+      this.tempVoices.createIndex({ guildId: 1, ownerId: 1 }),
+      this.reactionRoles.createIndex({ guildId: 1, messageId: 1 }),
     ]);
   }
 

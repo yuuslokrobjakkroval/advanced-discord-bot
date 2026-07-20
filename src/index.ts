@@ -14,6 +14,7 @@ import { onMessageCreate } from "./events/message-create.js";
 import { onMessageDelete, onMessageUpdate } from "./events/message-logs.js";
 import { startReminderWorker } from "./services/reminders.js";
 import { startGiveawayWorker } from "./services/giveaways.js";
+import { onVoiceStateUpdate } from "./events/voice.js";
 
 const client = new Client({
   intents: [
@@ -44,6 +45,7 @@ client.on(Events.MessageDelete, (message) => onMessageDelete(message, db).catch(
 client.on(Events.MessageUpdate, (oldMessage, newMessage) => onMessageUpdate(oldMessage, newMessage, db).catch(console.error));
 client.on(Events.GuildMemberAdd, (member) => onGuildMemberAdd(member, db).catch(console.error));
 client.on(Events.GuildMemberRemove, (member) => onGuildMemberRemove(member, db).catch(console.error));
+client.on(Events.VoiceStateUpdate, (oldState, newState) => onVoiceStateUpdate(oldState, newState, db).catch(console.error));
 client.on(Events.Error, console.error);
 process.on("unhandledRejection", console.error);
 for (const signal of ["SIGINT", "SIGTERM"] as const) {

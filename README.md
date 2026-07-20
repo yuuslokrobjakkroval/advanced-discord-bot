@@ -14,14 +14,18 @@ and Discord Components v2.
 - Message edit and deletion logging
 - Components v2 help and ticket panels
 - Persistent Components v2 giveaways with entry buttons, automatic ending, manual ending, and rerolls
+- Join-to-create voice rooms with automatic creation and cleanup
+- Components v2 voice panel with lock, unlock, rename, and delete actions
+- Voice limits, permit/reject, disconnect, and ownership transfer controls
+- Persistent Components v2 reaction-role panels with select menus
+- Role hierarchy, managed-role, duplicate, and option-limit validation
 - Reviews, invite statistics, and configurable auto reactions
 - Ticket add/remove-user controls
 - `/user-info`, `/server-info`, and an expanded stateful arcade
 - MongoDB indexes, environment validation, and graceful shutdown
 
-The repository is an extensible, launch-ready core. Reaction roles, persistent invite
-attribution, join-to-create voice controls, and production-grade multiplayer game
-matchmaking remain future modules.
+The repository is an extensible, launch-ready core. Persistent invite attribution and
+production-grade multiplayer game matchmaking remain future modules.
 
 ## Requirements
 
@@ -59,6 +63,7 @@ bun start
 3. Run `/setup` to select log, welcome, leave, ticket category, and support role.
 4. Run `/automod status`, then customize the blocked-word list.
 5. Run `/ticket panel` in the channel where members should open tickets.
+6. Run `/voice setup` to create the join-to-create lobby and voice category.
 
 ## Commands
 
@@ -76,6 +81,8 @@ bun start
 - `/games rps|slots|coinflip|dice`
 - `/games 2048|connect-4|hangman|minesweeper|pokemon|snake|trivia|wordle|tic-tac-toe`
 - `/giveaway create|end|reroll`
+- `/voice setup|rename|limit|lock|unlock|permit|reject|transfer`
+- `/reaction-role create|add|remove|refresh|delete|list`
 
 Never commit `.env`. Restrict the bot to only the Discord and MongoDB permissions it
 needs. Commands live in `src/commands`, events in `src/events`, and recurring workers
